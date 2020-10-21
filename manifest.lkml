@@ -1,5 +1,5 @@
 application: data-portal {
-  label: "Data Portal"
+  label: "EF Education"
   file: "dist/data_portal.js"  
   entitlements: {
     allow_same_origin: yes

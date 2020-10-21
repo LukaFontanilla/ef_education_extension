@@ -25,70 +25,89 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Switch, Route, Link, useHistory, useLocation } from 'react-router-dom'
 import styled from "styled-components";
-import qs from 'query-string';
 import { ExtensionContext } from '@looker/extension-sdk-react'
-import { EmbedDashboard } from './EmbedDashboard'
 import { EmbedLook } from './EmbedLook'
+import { EmbedDashboard } from './EmbedDashboard'
 
 import { 
-  Heading, 
+  Heading,
+  Button, 
   Flex, 
   FlexItem,
   MenuList,
-  MenuGroup,
   MenuItem,
-  Spinner,
-  theme 
+  Icon,
+  Card,
+  CardContent,
+  CardMedia,
+  Text,
+  SpaceVertical,
+  Box,
+  Table,
+  TableBody,
+  TableDataCell,
+  TableHead,
+  TableRow,
+  TableHeaderCell,
+  Accordion,
+  AccordionContent,
+  AccordionDisclosure,
+  ButtonItem,
+  ButtonToggle
 } from '@looker/components'
-import SidebarToggle from './SidebarToggle'
+import  Loader  from "react-loader-spinner"
+import CountUp from 'react-countup'
+import Spectrum from "react-spectrum"
+import { QueryPage } from './QueryPage'
+import { AttributeTable } from './AttributeTable'
 
 
-let headerTitle = 'Looker Data Platform'
-let headerColor = theme.colors.palette.white
-let headerBackground = theme.colors.palette.purple400
-let headerImage = 'https://storage.googleapis.com/jonwalls_demo/logo.png'
-let configUrl = ''
 
 const Extension = ( { route, routeState } ) => {
   const context = useContext(ExtensionContext)
   const sdk = context.core40SDK
   let history = useHistory();
-  let location = useLocation();
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [boardId, setBoardId] = useState()
-  const [filters, setFilters] = useState(qs.parse(location.search))
-  const [board, setBoard] = useState({})
   const [user, setUser] = useState({})
-  const [renderBoard, setRenderBoard] = useState(false)
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
+  const [userRole, setRole] = useState({})
+  const [groups, setGroup] = useState([])
+  const [query, setQuery] = useState({})
+  const [attributes, setAttributes] = useState([])
+  const [value, setValue] = useState('User Home')
 
   const menuGroups = [];
 
-  useEffect(()=>{
-    getUser();
-  }, [])
+  //////// Lifecycle Methods //////////
 
   useEffect(()=>{
-    if (user && user.id) {
-      getBoardId();
+    getUser();
+    getGroups();
+  }, [])
+
+  useEffect(() => {
+    if(user){ 
+      getRoles();
+      // runQuery();
     }
   }, [user])
 
-  useEffect(()=>{
-    if (boardId) {
-      getBoard();
+  useEffect(() => {
+    if(user.display_name) {
+      runQuery();
     }
-  }, [boardId])
+  }, [user.display_name])
 
-  useEffect(()=>{
-    if (filters) {
-      history.push({
-        pathname: location.pathname,
-        search: qs.stringify(filters)
-      })
+  useEffect(() => {
+    if(user.id) {
+      getUserAttributes();
     }
-  }, [filters])
+  }, [user.id])
+
+  /////////////////////////////////////
+
+
+
+  ///////// SDK METHODS //////////// 
 
   const getUser = async () => {
     try {
@@ -97,244 +116,280 @@ const Extension = ( { route, routeState } ) => {
       )
       setUser(userDetails)
     } catch (error) {
-      // console.log('failed to get user', error)
+       console.log('failed to get user', error)
     }
   }
 
-  const getBoardId = async () => {
-    let portalBoardAttributeId = null
+  const getRoles = async () => {
     try {
-      const userAttributes = await sdk.ok(
-        sdk.all_user_attributes({fields: ['id', 'name']})
-      )
-      portalBoardAttributeId = userAttributes.find(attr => attr.name === 'portal_board').id
-      // console.log('portalBoardAttributeId', portalBoardAttributeId)
-    } catch (error) {
-      // console.log('failed to get id of portal_board attribute', error)
-    }
-    
-    if (portalBoardAttributeId) {
-      try {
-        const attributeValue = await sdk.ok(
-          sdk.user_attribute_user_values({
-            user_id: user.id,
-            user_attribute_ids: [portalBoardAttributeId],
-          })
+      // await user.role_ids.forEach((role) => {
+          const userRoles = await sdk.ok(
+          sdk.role(user.role_ids)
         )
-        // console.log('attributeValue', attributeValue)
-        if (attributeValue && attributeValue.length && attributeValue[0].value ) {
-          setBoardId(parseInt(attributeValue[0].value))
-        }
-      } catch (error) {
-        // console.log('failed to get id of portal_board attribute', error)
-      }
-    }
-  }
-
-  const getBoard = async () => {
-    try {
-      const boardDetails = await sdk.ok(
-        sdk.board(boardId)
-      )
-      setBoard(boardDetails)
-      setRenderBoard(true)
+          setRole(userRoles)
+        // console.log(roles)
+      // })
     } catch (error) {
-      // console.log('failed to get board', error)
-      setRenderBoard(true)
+      console.log('failed to get roles', error)
     }
   }
 
-  if (board.title) {
-    headerTitle = board.title
+  const getGroups = async () => {
+    try {
+      const userGroupDetails = await sdk.ok(
+        sdk.all_groups({fields:`name, user_count, contains_current_user, id`})
+      )
+      const cleaned = userGroupDetails.filter(detail => detail.contains_current_user == true)
+      setGroup(cleaned)
+    } catch (error) {
+       console.log('failed to get groups', error)
+    }
   }
 
-  const descriptionLines = board.description?.split('\n')
-  // console.log('descriptionLines', descriptionLines)
-
-  descriptionLines?.forEach(line => {
-    var tags = line.split(':')
-    if (tags.length === 2) {
-      switch(tags[0]) {
-        case 'color':
-          headerColor = tags[1]
-          break
-        case 'background':
-          headerBackground = tags[1]
-          break
-        case 'image':
-          headerImage = tags[1]
-          break
-        case 'config':
-          configUrl = tags[1]
-          break
-      }
+  const getUserAttributes = async () => {
+    try {
+      const allAttributes = await sdk.ok(
+        sdk.user_attribute_user_values({user_id: user.id})
+      )
+      const cleaned = allAttributes.filter(attribute => attribute.value != "")
+      // console.log(cleaned)
+      setAttributes(cleaned)
+    } catch (error) {
+      console.log('failed to get user attributes', error)
     }
-  })
-  
-  board.board_sections?.forEach((board_section, i) => {
-    const group = {
-      key: i,
-      title: board_section.title,
-      items: []
+  }
+
+  const runQuery = async () => {
+    try {
+      const queryDetails = await sdk.ok(
+        sdk.run_inline_query({
+          result_format: 'json_detail',
+          body: {
+            model: 'system__activity', 
+            view:'history', 
+            fields: ['history.query_run_count', 'history.approximate_usage_in_minutes'],
+            filters : {'user.name':user.display_name} 
+          },
+        })
+      )
+      console.log(queryDetails)
+
+      /////// queryDetails.data contains object literals that have the data needed
+      /////// the below is used for transformation to access those name objects
+
+      const userQuery = queryDetails.data ?? []
+      const cleanedQuery = Object.assign(userQuery[0] ?? {})
+      const queries = []
+      const test = Object.keys(cleanedQuery).forEach((key) => queries.push(cleanedQuery[key] ?? {}))
+      
+      ///////
+
+      setQuery(queries)
+    } catch (error) {
+      console.log('failed to get query', error)
     }
-    const icons = board_section.description.split(',')
-    board_section.board_items.forEach((item, j) => {
-      group.items.push({
-        key: j,
-        title: item.title,
-        type: item.url.split('/')[1],
-        url: item.url,
-        icon: icons[j] ? icons[j] : 'Dashboard'
-      })
-    })
-    menuGroups.push(group)
-  })
+  }
 
-  // console.log('menuGroups:', menuGroups)
+  ///////////////////////////////////
 
-  if (renderBoard) {
-    return (
-      <>
-        <PageHeader
-            color={headerColor} 
-            backgroundColor={headerBackground}
+
+  //// Clean Up Methods /////////
+
+  const userPermissions = Object.assign(userRole.permission_set ?? {})
+  const userModels = Object.assign(userRole.model_set ?? {})
+  const queriesOne = Object.assign(query[0] ?? {})
+  const queriesTwo = Object.assign(query[1] ?? {})
+
+  ///////////////////////////////////////////////
+
+  return(
+    <>
+      <Card raised height="auto">
+      <CardContent>
+        <Heading fontSize="xlarge">DCL: Extension Framework Sandbox</Heading>
+        <Heading as="h4" fontSize="xsmall">
+          Explore JS API - Embed SDK - Components
+        </Heading>
+        <Text fontSize="xsmall" variant="subdued">
+          Savvvvvyy
+        </Text>
+      </CardContent>
+      </Card>
+      <Flex height="auto">
+        <Box
+          width="auto"
+          height="auto"
+          bg=""
+          p="small"
+          border="15px black"
+          borderRight="solid 1px"
+          borderColor="palette.charcoal200"
         >
-          <FlexItem width="40%">
-            <Heading as="h1" fontWeight='bold'>{headerTitle}</Heading>
-          </FlexItem>
-          <FlexItem>
-            <img src={headerImage} alt="logo" height="50px" />
-          </FlexItem>
-          <FlexItem width="40%"></FlexItem>
-        </PageHeader>
-  
-        <PageLayout open={sidebarOpen}>
-          <LayoutSidebar>
-            {sidebarOpen &&
-              <MenuList>
-                {menuGroups.map(group => (
-                  <MenuGroup key={group.key} label={group.title}>
-                    {group.items.map(item => {
-                      return (
-                      <Link 
-                        key={item.key}  
-                        to={{
-                          pathname: item.url, 
-                          search: location.search
-                        }}
-                      >
-                        <MenuItem 
-                          current={(location.pathname===item.url) ? true : false}
-                          icon={item.icon}
-                        >{item.title}</MenuItem>
-                      </Link>
-                      )}
-                    )}
-                  </MenuGroup>
-                ))}
-              </MenuList>
-            }
-          </LayoutSidebar>
-  
-          <SidebarDivider open={sidebarOpen}>
-            <SidebarToggle
-              isOpen={sidebarOpen}
-              onClick={toggleSidebar}
-              headerHeight="80px"
-            />
-          </SidebarDivider>
-  
-          <PageContent>
-            <Switch>
-              <Route path='/dashboards-next/:ref' render={props => 
-                <EmbedDashboard 
-                  id={props.match.params.ref} 
-                  type="next" 
-                  {...{filters, setFilters}}
-                />
-              } />
-              <Route path='/dashboards/:ref' render={props => 
-                <EmbedDashboard id={props.match.params.ref} 
-                  type="legacy" 
-                  {...{filters, setFilters}}
-                />
-              } />
-              <Route path='/looks/:ref' render={props => 
-                <EmbedLook 
-                  id={props.match.params.ref} 
-                  {...{filters, setFilters}}
-                />
-              } />
-              <Route>
-                <div>Landing Page</div>
-              </Route>
-            </Switch>
-          </PageContent>
-  
-        </PageLayout>
-      </>
-    )
-  } else {
-    return (
-      <Flex width='100%' height='90%' alignItems='center' justifyContent='center'>
-        <Spinner color='black' />
+            <MenuList>
+            <MenuItem icon="Home">Home</MenuItem>
+            <MenuItem icon="Table"><a href="https://docs.looker.com/data-modeling/extension-framework/extension-framework-intro" target="_blank">Playbook Home</a></MenuItem>
+            <MenuItem icon="Image"><a href="https://www.istockphoto.com/jp/%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88/%E3%81%9F%E3%81%93%E7%84%BC%E3%81%8D?mediatype=illustration&phrase=%E3%81%9F%E3%81%93%E7%84%BC%E3%81%8D&sort=mostpopular" target="_blank">たこ焼き</a></MenuItem>
+            </MenuList>
+        </Box>
+        <Box flexGrow={1}> 
+
+      {!user.display_name ?
+      <Spectrum
+      width={500}
+      colors={["#e8ccfc","#b26efc","#4843fc","#edfe9a","#c5fd98","#7dfc91","#fee1b5"]}
+      wordWidths={[20,30,40,50,60]}
+      wordDistances={[4,4,6]}
+      lineDistance={6}
+      paragraphDistance={20}
+      paragraphs={1}
+      linesPerParagraph={6}
+      wordHeight={11}
+      wordRadius={10}
+      truncateLastLine={false} />
+      
+      :
+      <>
+      <Box padding="20px 20px 20px 20px" bg="white">
+      <Flex
+        px="large"
+        py="small"
+      >
+        <ButtonToggle value={value} onChange={setValue}>
+          <ButtonItem>User Home</ButtonItem>
+          <ButtonItem>Query Page</ButtonItem>
+        </ButtonToggle>
       </Flex>
-    )
-  }
-  
+      {value === "User Home" ?
+      <SpaceVertical> 
+      <Card raised height="auto" bg="#ea7dc">
+      <Flex
+        px="large"
+        mb="small"
+        mt="small"
+        height="auto"
+        width="auto"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+      <FlexItem >
+            <Box>
+            <Card raised>
+              <CardMedia image="https://picsum.photos/200/300?random=1" title="random_pic" />
+              <CardContent>
+              <Text
+                  fontSize="xsmall"
+                  textTransform="uppercase"
+                  fontWeight="semiBold"
+                  variant="subdued"
+              >
+                User
+              </Text>
+                <Heading as="h4" fontSize="medium" fontWeight="semiBold" >{user.display_name}</Heading>
+              </CardContent>
+            </Card>
+            </Box>
+        </FlexItem>
+      <FlexItem flex="2" padding="50px">
+            <Box>
+            <Heading fontSize="xxxxlarge" textAlign="left">
+              <Icon name="ExploreOutline" color="inform" size="large"/>  Query Run Count:  <CountUp end={queriesOne.value ?? 0} duration={4} /> <br/> <Icon name="Lqa" color="inform" size="large"/>  Approx. Web Usage in Minutes: <CountUp end={queriesTwo.value ?? 0} duration={4} />
+            </Heading>
+            </Box>
+      </FlexItem>
+      </Flex>
+      </Card>
+      <Box
+      padding="20px 20px 20px 20px"
+      width="100%"
+      height="50%"
+      bg="keyAccent"
+      border="1px solid black"
+      borderRadius="4px"
+      >
+      <Table px="30px" py="30px">
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell p="small">ID</TableHeaderCell>
+          <TableHeaderCell p="small">Display Name</TableHeaderCell>
+          <TableHeaderCell p="small">Email</TableHeaderCell>
+          <TableHeaderCell p="small">Locale</TableHeaderCell>
+          <TableHeaderCell p="small">Personal Folder ID</TableHeaderCell>
+          <TableHeaderCell p="small">Roles</TableHeaderCell>
+          <TableHeaderCell p="small">Groups</TableHeaderCell>
+          <TableHeaderCell p="small">Permissions</TableHeaderCell>
+          <TableHeaderCell p="small">Models</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        <TableRow>
+          <TableDataCell p="small">{user.id}</TableDataCell>
+          <TableDataCell p="small">{user.display_name}</TableDataCell>
+          <TableDataCell p="small">{user.email}</TableDataCell>
+          <TableDataCell p="small">{user.locale}</TableDataCell>
+          <TableDataCell p="small"><a href={"https://dcl.dev.looker.com/folders/" + user.personal_folder_id} target="_blank">{user.personal_folder_id}</a></TableDataCell>
+          <TableDataCell p="small"><strong>ID: </strong>  {userRole.id}  <b>Role: </b> {userRole.name}</TableDataCell>
+          <TableDataCell>
+          <Accordion>
+            <AccordionDisclosure>Group Information</AccordionDisclosure>
+            <AccordionContent>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>ID</TableHeaderCell>
+                  <TableHeaderCell>Name</TableHeaderCell>
+                  <TableHeaderCell>Total_Users</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {groups.map(group => 
+                <TableRow key={group.id}>
+                  <TableDataCell p="small">{group.id}</TableDataCell>
+                  <TableDataCell>{group.name}</TableDataCell>
+                  <TableDataCell>{group.user_count}</TableDataCell>
+                </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            </AccordionContent>
+          </Accordion>
+          </TableDataCell>
+          <TableDataCell p="small">
+            <Accordion>
+                <AccordionDisclosure>Show me the models!</AccordionDisclosure>
+                <AccordionContent>{userPermissions.permissions && userPermissions.permissions.map(p => p + '\n')}</AccordionContent>
+            </Accordion>  
+          </TableDataCell>
+          <TableDataCell p="small">
+            <Accordion>
+              <AccordionDisclosure>Show me the models!</AccordionDisclosure>
+              <AccordionContent>{userModels.models && userModels.models.map(m => m + '\n')}</AccordionContent>
+            </Accordion>
+          </TableDataCell>
+        </TableRow>
+      </TableBody> 
+      </Table>
+      
+    </Box>
+      <Card raised height="auto" bg="#ea7dc">
+
+      
+      <EmbedLook id={1985} value={user.display_name}/>
+      {/* <EmbedDashboard id={962} type="next" value={user.display_name}/> */}
+      </Card>
+      {/* <Button onClick={getUserAttributes}>CLick Me!</Button> */}
+      <AttributeTable data={attributes}/>
+    </SpaceVertical>
+    : 
+      <QueryPage data={user}/>
+    }
+    </Box>
+    </>
+    }
+    </Box>
+    </Flex>
+    
+    </>
+  )
 }
-
-
-const PageHeader = styled(Flex)`
-  justify-content: space-between;
-  background-color: ${props => props.backgroundColor};
-  background-position: 100% 0;
-  background-repeat: no-repeat;
-  background-size: 836px 80px;
-  padding: ${theme.space.large};
-  h1 {
-    color: ${props => props.color};
-  }
-`
-
-const PageLayout = styled.div`
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: ${props =>
-    props.open ? "16.625rem 0 1fr" : "1.5rem 0 1fr"};
-  grid-template-areas: "sidebar divider main";
-  position: relative;
-`
-
-const PageContent = styled.div`
-  grid-area: main;
-  position: relative;
-`
-
-const LayoutSidebar = styled.aside`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 16.625rem;
-  grid-area: sidebar;
-  z-index: 0;
-`
-
-const SidebarDivider = styled.div`
-  transition: border 0.3s;
-  border-left: 1px solid
-    ${props =>
-      props.open ? theme.colors.palette.charcoal200 : "transparent"};
-  grid-area: divider;
-  overflow: visible;
-  position: relative;
-  &:hover {
-    border-left: 1px solid
-      ${props =>
-        props.open
-          ? theme.colors.palette.charcoal300
-          : theme.colors.palette.charcoal200};
-  }
-`
 
 export default Extension

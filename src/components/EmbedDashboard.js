@@ -28,7 +28,7 @@ import { ExtensionContext } from '@looker/extension-sdk-react'
 import { EmbedContainer } from './EmbedContainer'
 
 
-export const EmbedDashboard = ({ id, type, filters, setFilters }) => {
+export const EmbedDashboard = ({id, value}) => {
   const [dashboard, setDashboard] = useState()
   const context = useContext(ExtensionContext)
 
@@ -36,11 +36,11 @@ export const EmbedDashboard = ({ id, type, filters, setFilters }) => {
     return { cancel: !event.modal }
   }
 
-  const filtersUpdated = (event) => {
-    if (event?.dashboard?.dashboard_filters) {
-      setFilters({...filters, ...event.dashboard.dashboard_filters})
-    }
-  }
+  // const filtersUpdated = (event) => {
+  //   if (event?.dashboard?.dashboard_filters) {
+  //     setFilters({...filters, ...event.dashboard.dashboard_filters})
+  //   }
+  // }
 
   const resizeContent = (height) => {
     var elem = document.getElementById('looker-embed').firstChild
@@ -55,18 +55,18 @@ export const EmbedDashboard = ({ id, type, filters, setFilters }) => {
         el.innerHTML = ''
         LookerEmbedSDK.init(hostUrl)
         const db = LookerEmbedSDK.createDashboardWithId(id)
-        if (type === "next") {
-          db.withNext()
-        }
+        // if (type === "next") {
+        //   db.withNext()
+        // }
         db.appendTo(el)
           .withClassName('looker-dashboard')
-          .withFilters(filters)
+          .withFilters({'user.name': value})
           .on('page:properties:changed', (e) => resizeContent(e.height))
           .on('drillmenu:click', canceller)
           .on('drillmodal:explore', canceller)
           .on('dashboard:tile:explore', canceller)
           .on('dashboard:tile:view', canceller)
-          .on('dashboard:filters:changed', filtersUpdated)
+          // .on('dashboard:filters:changed', filtersUpdated)
           .build()
           .connect()
           .catch((error) => {
@@ -74,7 +74,7 @@ export const EmbedDashboard = ({ id, type, filters, setFilters }) => {
           })
       }
     },
-    [id, type]
+    [id, value]
   )
 
   return <EmbedContainer id='looker-embed' ref={embedCtrRef} />

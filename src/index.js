@@ -52,9 +52,9 @@ const Main = () => {
   }
   return <>
     <ExtensionProvider 
-      loadingComponent={loading} 
-      requiredLookerVersion='>=7.12.0'
-      onRouteChange={onRouteChange}
+      // loadingComponent={loading} 
+      // requiredLookerVersion='>=7.12.0'
+      // onRouteChange={onRouteChange}
     >
       <ComponentsProvider>
         <Extension route={route} routeState={routeState}/>

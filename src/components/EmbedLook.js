@@ -22,19 +22,16 @@
  * THE SOFTWARE.
  */
 
-import React, { useCallback, useContext } from 'react'
-import { LookerEmbedSDK } from '@looker/embed-sdk'
+import React, { useCallback, useContext, useState } from 'react'
+import { LookerEmbedSDK, LookerEmbedLook } from '@looker/embed-sdk'
 import { EmbedContainer } from './EmbedContainer'
 import { ExtensionContext } from '@looker/extension-sdk-react'
+import { Heading } from '@looker/components'
 
-export const EmbedLook = ({ id, filters, setFilters }) => {
+
+export const EmbedLook = ({ id, value }) => {
   const context = useContext(ExtensionContext)
-
-  const filtersUpdated = (event) => {
-    if (event?.dashboard?.dashboard_filters) {
-      setFilters({...filters, ...event.dashboard.dashboard_filters})
-    }
-  }
+  const [complete, setComplete] = useState(false)
 
   const embedCtrRef = useCallback(
     (el) => {
@@ -46,7 +43,9 @@ export const EmbedLook = ({ id, filters, setFilters }) => {
         LookerEmbedSDK.createLookWithId(id)
           .appendTo(el)
           .withClassName('looker-look')
-          .on('look:filters:changed', filtersUpdated)
+          .withFilters({'user.name': value})
+          .on('drillmodal:explore', setComplete(true))
+          .on('explore:ready', setComplete(false))
           .build()
           .connect()
           .catch((error) => {
@@ -55,5 +54,11 @@ export const EmbedLook = ({ id, filters, setFilters }) => {
       }
     }, [id])
 
-  return <EmbedContainer id='looker-embed' ref={embedCtrRef} />
+  return (
+    <>
+      <EmbedContainer id='looker-embed' ref={embedCtrRef} />
+      {complete && <Heading>Drill Explore Opened</Heading>}
+    </>
+  )
+
 }
