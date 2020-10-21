@@ -1,25 +1,6 @@
-# Data Portal
+# EF Education Extension
 
 ## Configuration instructions
-
-1. Add a user attribute named 'portal_board'
-   - Admin -> User Attributes
-   - Click 'Create User Attribute'
-   - Name: portal_board
-   - Label: Portal Board (will be set automatically from name)
-   - Data Type: number
-   - User Access: view (recommended – portal access should be based on group)
-   - Hide Values: no
-   - Set a default value: true
-     - It's important to have a default board!
-
-## TODOs
-
-- Review "landing page experience" e.g. start with a default dashboard
-- Improve logo support in page header
-- Support for explores
-- Complete and test packaging for Marketplace
-
 
 ## Looker Extension using React & JavaScript
 
@@ -56,7 +37,7 @@ The Data Portal uses [React](https://reactjs.org/) and JavaScript, the [React Ex
 6. In your copy of the extension tablet you have `manifest.lkml` file.
 
     You can either drag & upload this file into your Looker project, or create your own manifest file (e.g. to change the extension name).
-7. Update the `data_portal.model.lkml` file in your project:
+7. Update the `ef_education_extension.model.lkml` file in your project:
     - Add a [connection parameter](https://docs.looker.com/r/lookml/types/model/connection) to this model. It can be any connection, it doesn't matter which.
     - [Configure the model you created](https://docs.looker.com/r/develop/configure-model) so that it has access to the connection.
 8. Connect your new project to Git. You can do this multiple ways:
@@ -75,16 +56,21 @@ The process above requires your local development server to be running to load t
 2. Drag and drop the generated `dist/data_portal.js` file into the Looker project interface
 3. Modify your `manifest.lkml` to use `file` instead of `url`:
     ```
-    application: data-portal {
-      label: "Data Portal"
-      file: "data_portal.js"
+    application: ef_education_extension {
+      label: "EF Education Extension"
+      file: "ef_education_extension.js"
     }
     ```
+## TODOs
+
+- Implement Examples Leveraging External API's (use server proxy to resolve api keys, otherwise fetchproxy will surface keys in the header to the public internet)
+- Add examples of put or post commands from extension (for example form box where use can select a user attribute and change the value from extension itself)
+- clean up design of extension
 
 ## Notes
 
 - Webpack's module splitting is not currently supported.
-- The template uses Looker's component library and styled components. Neither of these libraries are required so you may remove and replace them with a component library of your own choice,
+- The template uses Looker's component library, styled components, as well as additional third party libraries. 
 
 ## Related Projects
 

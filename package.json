@@ -1,10 +1,10 @@
 {
-  "name": "simple_data_portal",
+  "name": "ef_education_extension",
   "version": "0.2.0",
-  "description": "Simple example of using a Looker extension for a data portal",
+  "description": "DCL: Playground Extension for EF Curriculum",
   "main": "index.js",
-  "repository": "https://github.com/ContrastingSounds/simple_data_portal",
-  "author": "Jon Walls",
+  "repository": "https://github.com/LukaFontanilla/ef_education_extension",
+  "author": "Lukas Fontanilla",
   "license": "MIT",
   "dependencies": {
     "@looker/components": "^0.9.16",

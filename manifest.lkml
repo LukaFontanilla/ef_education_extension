@@ -1,4 +1,4 @@
-application: data-portal {
+application: ef_education_extension {
   label: "EF Education"
   file: "dist/data_portal.js"  
   entitlements: {

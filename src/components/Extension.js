@@ -221,7 +221,7 @@ const Extension = ( { route, routeState } ) => {
           height="auto"
           bg=""
           p="small"
-          border="15px black"
+          border="10px black"
           borderRight="solid 1px"
           borderColor="palette.charcoal200"
         >
@@ -249,7 +249,7 @@ const Extension = ( { route, routeState } ) => {
       
       :
       <>
-      <Box padding="20px 20px 20px 20px" bg="white">
+      <Box padding="20px 50px 50px 50px" bg="white">
       <Flex
         px="large"
         py="small"
@@ -260,7 +260,7 @@ const Extension = ( { route, routeState } ) => {
         </ButtonToggle>
       </Flex>
       {value === "User Home" ?
-      <SpaceVertical> 
+      <SpaceVertical gap="xxxlarge"> 
       <Card raised height="auto" bg="#ea7dc">
       <Flex
         px="large"
