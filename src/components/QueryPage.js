@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Heading, Box } from '@looker/components'
+import { Heading, Box, Card } from '@looker/components'
 import styled from 'styled-components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import { ExtensionButton } from './ExtensionButton'
