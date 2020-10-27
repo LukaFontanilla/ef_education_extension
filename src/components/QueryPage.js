@@ -13,6 +13,7 @@ export const QueryPage = (props) => {
     const [messages, setMessages] = useState('')
     const [funFact, setFunFact] = useState('')
     const [usersState, setUsersState] = useState(props)
+    const [attribute, setAttribute] = useState([])
     const sdk = context.core40SDK
     
     
@@ -59,6 +60,7 @@ export const QueryPage = (props) => {
     //       sdk.some_api_endpoint()
     //     )
     //       updateMessages(JSON.stringify(placeholder, null, 2))
+    //       setAttribute(allAttributes)
     //   } catch (error) {
     //     console.log('failed to get user attributes', error)
     //   }
@@ -102,6 +104,9 @@ export const QueryPage = (props) => {
                   <StyledPre>{messages}</StyledPre>
                 </DialogContent>
             </Box>
+        </Box>
+        <Box>
+          {JSON.stringify()}
         </Box>
         </>
     )
