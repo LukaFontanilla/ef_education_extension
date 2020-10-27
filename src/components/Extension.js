@@ -96,12 +96,6 @@ const Extension = ( { route, routeState } ) => {
     }
   }, [user.display_name])
 
-  useEffect(() => {
-    if(user.id) {
-      getUserAttributes();
-    }
-  }, [user.id])
-
   /////////////////////////////////////
 
 
@@ -123,10 +117,10 @@ const Extension = ( { route, routeState } ) => {
     try {
       // await user.role_ids.forEach((role) => {
           const userRoles = await sdk.ok(
-          sdk.role(user.role_ids)
+          sdk.role(user.role_ids[0])
         )
           setRole(userRoles)
-        // console.log(roles)
+        // console.log(userRoles)
       // })
     } catch (error) {
       console.log('failed to get roles', error)

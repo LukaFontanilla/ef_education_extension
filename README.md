@@ -4,7 +4,7 @@
 
 ## Looker Extension using React & JavaScript
 
-The Data Portal uses [React](https://reactjs.org/) and JavaScript, the [React Extension SDK](https://github.com/looker-open-source/extension-sdk-react) for interacting with Looker, and [Webpack](https://webpack.js.org/) for building the code.
+The EF Education Extension uses [React](https://reactjs.org/) and JavaScript, the [React Extension SDK](https://github.com/looker-open-source/extension-sdk-react) for interacting with Looker, and [Webpack](https://webpack.js.org/) for building the code.
 
 ## Getting Started for Development
 
@@ -53,12 +53,12 @@ The Data Portal uses [React](https://reactjs.org/) and JavaScript, the [React Ex
 The process above requires your local development server to be running to load the extension code. To allow other people to use the extension, we can build the JavaScript file and include it in the project directly.
 
 1. In your extension project directory on your development machine you can build the extension with `yarn build`.
-2. Drag and drop the generated `dist/data_portal.js` file into the Looker project interface
+2. Drag and drop the generated `bundle.js` file into the Looker project interface
 3. Modify your `manifest.lkml` to use `file` instead of `url`:
     ```
     application: ef_education_extension {
       label: "EF Education Extension"
-      file: "ef_education_extension.js"
+      file: "bundle.js"
     }
     ```
 ## TODOs

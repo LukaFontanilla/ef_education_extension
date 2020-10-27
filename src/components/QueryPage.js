@@ -52,17 +52,17 @@ export const QueryPage = (props) => {
     }
 
 
-    const getUserAttributes = async () => {
-      try {
-        const attributes = usersState.data.id
-        const allAttributes = await sdk.ok(
-          sdk.some_api_endpoint()
-        )
-          updateMessages(JSON.stringify(placeholder, null, 2))
-      } catch (error) {
-        console.log('failed to get user attributes', error)
-      }
-    }
+    // const getUserAttributes = async () => {
+    //   try {
+    //     const attributes = usersState.data.id
+    //     const allAttributes = await sdk.ok(
+    //       sdk.some_api_endpoint()
+    //     )
+    //       updateMessages(JSON.stringify(placeholder, null, 2))
+    //   } catch (error) {
+    //     console.log('failed to get user attributes', error)
+    //   }
+    // }
 
     /////////////////////
 
@@ -79,13 +79,13 @@ export const QueryPage = (props) => {
               >
                 Get User (me())
               </ExtensionButton>
-              <ExtensionButton
+              {/* <ExtensionButton
                 mt="small"
                 variant="outline"
                 onClick={getUserAttributes}
               >
                 Get User Attributes
-              </ExtensionButton>
+              </ExtensionButton> */}
               <ExtensionButton
                 mt="small"
                 variant="outline"
