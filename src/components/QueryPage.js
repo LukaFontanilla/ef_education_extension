@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Heading, Box } from '@looker/components'
+import { Heading, Box, DialogContent, DividerVertical, Flex } from '@looker/components'
 import styled from 'styled-components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import { ExtensionButton } from './ExtensionButton'
@@ -51,15 +51,27 @@ export const QueryPage = (props) => {
         }
     }
 
+    const name_of_function = async () => {
+      try {
+        const some_variable = await sdk.ok(
+          sdk.some_api_method()
+        )
+          /// do something here
+      } catch (error) {
+          /// do something here
+      }
+  }
+
     const getUserAttributes = async () => {
       try {
         const attributes = usersState.data.id
         const allAttributes = await sdk.ok(
-          sdk.user_attribute_user_values({user_id: attributes, fields: `label, value, user_can_edit`})
+          sdk.user_attribute_user_values({user_id: attributes, fields: 'label, value, user_can_edit'})
+          // sdk.user_attribute_user_values({user_id: attributes})
         )
-        const cleaned = allAttributes.filter(attribute => attribute.value != "")
+        // const cleaned = allAttributes.filter(attribute => attribute.value != "")
         // console.log(cleaned)
-          updateMessages(JSON.stringify(cleaned, null, 2))
+          updateMessages(JSON.stringify(allAttributes, null, 2))
       } catch (error) {
         console.log('failed to get user attributes', error)
       }
@@ -132,8 +144,13 @@ export const QueryPage = (props) => {
                 Clear messages
             </ExtensionButton>
             </Box>
-            <Box pr="large" width="100%">
-                <StyledPre>{messages}</StyledPre>
+            <Box>
+              <DividerVertical stretch/>
+            </Box>
+            <Box height="30rem" pr="large" width="100%">
+                <DialogContent>
+                  <StyledPre>{messages}</StyledPre>
+                </DialogContent>
             </Box>
         </Box>
         </>
@@ -143,7 +160,6 @@ export const QueryPage = (props) => {
 
 const StyledPre = styled.pre`
   margin: 0 0 0 20px;
-  border: 1px solid #c1c6cc;
   height: 100%;
   padding: 20px;
 `

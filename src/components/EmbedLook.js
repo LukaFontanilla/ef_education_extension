@@ -33,6 +33,10 @@ export const EmbedLook = ({ id, value }) => {
   const context = useContext(ExtensionContext)
   const [complete, setComplete] = useState(false)
 
+  const updateUI = (complete) => {
+    setComplete(complete)
+  }
+
   const embedCtrRef = useCallback(
     (el) => {
       const hostUrl = context?.extensionSDK?.lookerHostData?.hostUrl
@@ -44,7 +48,7 @@ export const EmbedLook = ({ id, value }) => {
           .appendTo(el)
           .withClassName('looker-look')
           .withFilters({'user.name': value})
-          .on('drillmodal:explore', setComplete(true))
+          .on('drillmodal:explore', updateUI.bind(null, true))
           .on('explore:ready', setComplete(false))
           .build()
           .connect()
