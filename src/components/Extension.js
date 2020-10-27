@@ -72,7 +72,6 @@ const Extension = ( { route, routeState } ) => {
   const [userRole, setRole] = useState({})
   const [groups, setGroup] = useState([])
   const [query, setQuery] = useState({})
-  const [attributes, setAttributes] = useState([])
   const [value, setValue] = useState('User Home')
 
   const menuGroups = [];
@@ -146,18 +145,6 @@ const Extension = ( { route, routeState } ) => {
     }
   }
 
-  const getUserAttributes = async () => {
-    try {
-      const allAttributes = await sdk.ok(
-        sdk.user_attribute_user_values({user_id: user.id})
-      )
-      const cleaned = allAttributes.filter(attribute => attribute.value != "")
-      // console.log(cleaned)
-      setAttributes(cleaned)
-    } catch (error) {
-      console.log('failed to get user attributes', error)
-    }
-  }
 
   const runQuery = async () => {
     try {
@@ -371,13 +358,8 @@ const Extension = ( { route, routeState } ) => {
       
     </Box>
       <Card raised height="auto" bg="#ea7dc">
-
-      
-      {/* <EmbedLook id={1985} value={user.display_name}/> */}
       <EmbedDashboard id={962} type="next" value={user.display_name}/>
       </Card>
-      {/* <Button onClick={getUserAttributes}>CLick Me!</Button> */}
-      <AttributeTable data={attributes}/>
     </SpaceVertical>
     : 
       <QueryPage data={user}/>

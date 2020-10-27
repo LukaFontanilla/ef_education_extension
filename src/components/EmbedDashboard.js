@@ -26,13 +26,11 @@ import React, { useCallback, useContext, useState } from 'react'
 import { LookerEmbedSDK } from '@looker/embed-sdk'
 import { ExtensionContext } from '@looker/extension-sdk-react'
 import { EmbedContainer } from './EmbedContainer'
-import { Heading, MessageBar, Paragraph } from '@looker/components'
 
 
 export const EmbedDashboard = ({id, value}) => {
   const [dashboard, setDashboard] = useState()
   const context = useContext(ExtensionContext)
-  const [show, setShow] = useState(false)
 
 
   //// event listener functions ////
@@ -44,15 +42,6 @@ export const EmbedDashboard = ({id, value}) => {
   const resizeContent = (height) => {
     var elem = document.getElementById('looker-embed').firstChild
     elem.setAttribute('height', height)
-  }
-
-  const updateUI = (show, callback) => {
-    setShow(show);
-    callback();
-  }
-
-  const revertUI = () => {
-      setTimeout(() => setShow(false), 5000)
   }
 
 
@@ -71,12 +60,7 @@ export const EmbedDashboard = ({id, value}) => {
         
         db.appendTo(el)
           .withClassName('looker-dashboard')
-          .withFilters({'user.name': value})
           .on('page:properties:changed', (e) => resizeContent(e.height))
-          .on('drillmenu:click', canceller)
-          .on('drillmodal:explore', canceller)
-          .on('dashboard:tile:explore', updateUI.bind(null, true, revertUI))
-          .on('dashboard:tile:view', canceller)
           .build()
           .connect()
           .catch((error) => {
@@ -90,14 +74,8 @@ export const EmbedDashboard = ({id, value}) => {
   ////////////////////////////////////
 
   return (
-    <>
-    {show ? <MessageBar intent="warn">
-              <Paragraph>
-                <strong>FYI</strong> currently exploring dashboard tiles is not allowed. Please contact the lookerdev@yourstruly.com for further inquires.
-              </Paragraph>
-            </MessageBar> :
-    <EmbedContainer id='looker-embed' ref={embedCtrRef} />
-    }
+    <> 
+      <EmbedContainer id='looker-embed' ref={embedCtrRef} />
     </>
   )
 }

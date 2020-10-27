@@ -51,27 +51,14 @@ export const QueryPage = (props) => {
         }
     }
 
-    const name_of_function = async () => {
-      try {
-        const some_variable = await sdk.ok(
-          sdk.some_api_method()
-        )
-          /// do something here
-      } catch (error) {
-          /// do something here
-      }
-  }
 
     const getUserAttributes = async () => {
       try {
         const attributes = usersState.data.id
         const allAttributes = await sdk.ok(
-          sdk.user_attribute_user_values({user_id: attributes, fields: 'label, value, user_can_edit'})
-          // sdk.user_attribute_user_values({user_id: attributes})
+          sdk.some_api_endpoint()
         )
-        // const cleaned = allAttributes.filter(attribute => attribute.value != "")
-        // console.log(cleaned)
-          updateMessages(JSON.stringify(allAttributes, null, 2))
+          updateMessages(JSON.stringify(placeholder, null, 2))
       } catch (error) {
         console.log('failed to get user attributes', error)
       }
@@ -80,39 +67,9 @@ export const QueryPage = (props) => {
     /////////////////////
 
 
-    ////// External API Method ////////
-    const runRapid = async () => { 
-      let rapidApi = `https://rapidapi.p.rapidapi.com/333/math?fragment=true&json=true`
-      let response = await extensionSDK.fetchProxy(
-      `${rapidApi}`,
-      {
-        method: 'GET',
-        headers: {
-          "x-rapidapi-host": "numbersapi.p.rapidapi.com",
-          "x-rapidapi-key": process.env.RAPID_API_KEY
-        }
-        ,
-        body: JSON.stringify(response)
-      }
-      ).then(response => {
-          // console.log(response)
-          setFunFact(response.body.text)
-        })
-    }
-
-    /////////////////////
-
     return (
         <>
           <Heading mt="xlarge">Query Playground</Heading>
-          {/* {!funFact ? 
-          <Loader 
-          type="Puff"       
-          color="#00BFFF"
-          height={100}
-          width={100}
-          timeout={3000}/> :
-          <Heading mt="medium">{funFact}</Heading>} */}
           <Box display="flex" flexDirection="row">
             <Box display="flex" flexDirection="column" width="50%" maxWidth="40vw">
               <ExtensionButton
@@ -129,13 +86,6 @@ export const QueryPage = (props) => {
               >
                 Get User Attributes
               </ExtensionButton>
-              {/* <ExtensionButton
-                mt="small"
-                variant="outline"
-                onClick={runRapid}
-              >
-                Add New SDK Method Here
-              </ExtensionButton> */}
               <ExtensionButton
                 mt="small"
                 variant="outline"
