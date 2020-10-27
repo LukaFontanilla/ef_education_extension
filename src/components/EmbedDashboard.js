@@ -26,26 +26,36 @@ import React, { useCallback, useContext, useState } from 'react'
 import { LookerEmbedSDK } from '@looker/embed-sdk'
 import { ExtensionContext } from '@looker/extension-sdk-react'
 import { EmbedContainer } from './EmbedContainer'
+import { Heading, MessageBar, Paragraph } from '@looker/components'
 
 
 export const EmbedDashboard = ({id, value}) => {
   const [dashboard, setDashboard] = useState()
   const context = useContext(ExtensionContext)
+  const [show, setShow] = useState(false)
 
+
+  ///////// event listener functions ///
+  
   const canceller = (event) => {
     return { cancel: !event.modal }
   }
-
-  // const filtersUpdated = (event) => {
-  //   if (event?.dashboard?.dashboard_filters) {
-  //     setFilters({...filters, ...event.dashboard.dashboard_filters})
-  //   }
-  // }
 
   const resizeContent = (height) => {
     var elem = document.getElementById('looker-embed').firstChild
     elem.setAttribute('height', height)
   }
+
+  const updateUI = (show, callback) => {
+    setShow(show);
+    callback();
+  }
+
+  const revertUI = () => {
+      setTimeout(() => setShow(false), 5000)
+  }
+
+  /////////////////////////////////
 
   const embedCtrRef = useCallback(
     (el) => {
@@ -66,7 +76,7 @@ export const EmbedDashboard = ({id, value}) => {
           .on('drillmodal:explore', canceller)
           .on('dashboard:tile:explore', canceller)
           .on('dashboard:tile:view', canceller)
-          // .on('dashboard:filters:changed', filtersUpdated)
+          .on('dashboard:tile:explore', updateUI.bind(null, true, revertUI))
           .build()
           .connect()
           .catch((error) => {
@@ -77,5 +87,15 @@ export const EmbedDashboard = ({id, value}) => {
     [id, value]
   )
 
-  return <EmbedContainer id='looker-embed' ref={embedCtrRef} />
+  return (
+    <>
+    {show ? <MessageBar intent="warn">
+              <Paragraph>
+                <strong>FYI</strong> currently exploring dashboard tiles is not allowed. Please contact the lookerdev@yourstruly.com for further inquires.
+              </Paragraph>
+            </MessageBar> :
+    <EmbedContainer id='looker-embed' ref={embedCtrRef} />
+    }
+    </>
+  )
 }
