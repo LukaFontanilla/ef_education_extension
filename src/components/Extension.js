@@ -59,7 +59,6 @@ import  Loader  from "react-loader-spinner"
 import CountUp from 'react-countup'
 import Spectrum from "react-spectrum"
 import { QueryPage } from './QueryPage'
-import { AttributeTable } from './AttributeTable'
 
 
 

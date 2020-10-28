@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Heading, Box, DialogContent, DividerVertical, Flex } from '@looker/components'
+import { Heading, Box, DialogContent, DividerVertical, Flex, Card, CardContent, CardMedia, Text } from '@looker/components'
 import styled from 'styled-components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import { ExtensionButton } from './ExtensionButton'
@@ -21,6 +21,12 @@ export const QueryPage = (props) => {
     useEffect(() => {
        setUsersState(props);
     },[props])
+
+    useEffect(() => {
+      if(usersState.data.id) {
+        getUserAttributes();
+      }
+    },[usersState.data.id])
 
     //// Used to update/clear the box component with results of query ////
 
@@ -53,18 +59,20 @@ export const QueryPage = (props) => {
     }
 
 
-    // const getUserAttributes = async () => {
-    //   try {
-    //     const attributes = usersState.data.id
-    //     const allAttributes = await sdk.ok(
-    //       sdk.some_api_endpoint()
-    //     )
-    //       updateMessages(JSON.stringify(placeholder, null, 2))
-    //       setAttribute(allAttributes)
-    //   } catch (error) {
-    //     console.log('failed to get user attributes', error)
-    //   }
-    // }
+    const getUserAttributes = async () => {
+      try {
+        const attributes = usersState.data.id
+        const allAttributes = await sdk.ok(
+          sdk.some_api_endpoint()
+        )
+          updateMessages(JSON.stringify(placeholder, null, 2))
+          setAttribute(allAttributes)
+      } catch (error) {
+        console.log('failed to get user attributes', error)
+      }
+    }
+
+    // const dataClean = Object.assign(attribute[0] ?? {})
 
     /////////////////////
 
@@ -105,8 +113,19 @@ export const QueryPage = (props) => {
                 </DialogContent>
             </Box>
         </Box>
-        <Box>
-          {JSON.stringify()}
+        <Box width="50%">
+          {/* {!dataClean.value ? <Loader />: */}
+
+          {/* Hints */}
+          {/* use this url for the card media image - https://picsum.photos/200/300?random=1 */}
+          {/* Rembember to import any new looker ui component you use at the top of this file */}
+          {/* To reference values from an object we use dot syntax, ie. object.key. For example dataClean.value to reference the value of the attribute */}
+          {/* To reference those values in a component we enclose them with {}, so for example <Text>{dataClean.value}</Text> */}
+
+            <Card raised>
+              {/* {JSON.stringify()} */}
+            </Card>
+            {/* } */}
         </Box>
         </>
     )
