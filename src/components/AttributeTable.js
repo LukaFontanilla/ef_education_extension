@@ -28,12 +28,12 @@ export const AttributeTable = (props) => {
 
     const attributes = userAttributes.map(({ name, value}, index) => {
         return (
-            index + 1 === currentPage && (
+            // index + 1 === currentPage && (
                 <TableRow key={name}>
                     <TableDataCell>{name}</TableDataCell>
                     <TableDataCell>{value}</TableDataCell>
                 </TableRow>
-            )
+            // )
         )
     })
 
@@ -55,11 +55,11 @@ export const AttributeTable = (props) => {
                      </TableBody>
                     </Table>
                 </Box>
-                <Pagination
+                {/* <Pagination
                     current={currentPage}
                     pages={totalPages}
                     onChange={setCurrentPage}
-                />
+                /> */}
                 </>
            
             {/* <Box>{JSON.stringify(attributes[0])}</Box> */}

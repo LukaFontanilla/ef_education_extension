@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Heading, Box, Card } from '@looker/components'
+import { Heading, Box, Card, CardMedia, CardContent, Text, SpaceVertical } from '@looker/components'
 import styled from 'styled-components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import { ExtensionButton } from './ExtensionButton'
@@ -13,6 +13,7 @@ export const QueryPage = (props) => {
     const [messages, setMessages] = useState('')
     const [funFact, setFunFact] = useState('')
     const [usersState, setUsersState] = useState(props)
+    const [data, setData] = useState([])
     const sdk = context.core40SDK
     
     
@@ -20,6 +21,12 @@ export const QueryPage = (props) => {
     useEffect(() => {
        setUsersState(props);
     },[props])
+
+    useEffect(() => {
+      if(usersState.data.id) {
+        getUserAttributes();
+      }
+    },[usersState.data.id])
 
     //// Used to update/clear the box component with results of query ////
 
@@ -59,34 +66,37 @@ export const QueryPage = (props) => {
         )
         const cleaned = allAttributes.filter(attribute => attribute.value != "")
         // console.log(cleaned)
-          updateMessages(JSON.stringify(cleaned, null, 2))
+          setData(cleaned)
+          // updateMessages(JSON.stringify(cleaned, null, 2))
       } catch (error) {
         console.log('failed to get user attributes', error)
       }
     }
 
+    const dataClean = Object.assign(data[0] ?? {})
+
     /////////////////////
 
 
     ////// External API Method ////////
-    const runRapid = async () => { 
-      let rapidApi = `https://rapidapi.p.rapidapi.com/333/math?fragment=true&json=true`
-      let response = await extensionSDK.fetchProxy(
-      `${rapidApi}`,
-      {
-        method: 'GET',
-        headers: {
-          "x-rapidapi-host": "numbersapi.p.rapidapi.com",
-          "x-rapidapi-key": process.env.RAPID_API_KEY
-        }
-        ,
-        body: JSON.stringify(response)
-      }
-      ).then(response => {
-          // console.log(response)
-          setFunFact(response.body.text)
-        })
-    }
+    // const runRapid = async () => { 
+    //   let rapidApi = `https://rapidapi.p.rapidapi.com/333/math?fragment=true&json=true`
+    //   let response = await extensionSDK.fetchProxy(
+    //   `${rapidApi}`,
+    //   {
+    //     method: 'GET',
+    //     headers: {
+    //       "x-rapidapi-host": "numbersapi.p.rapidapi.com",
+    //       "x-rapidapi-key": process.env.RAPID_API_KEY
+    //     }
+    //     ,
+    //     body: JSON.stringify(response)
+    //   }
+    //   ).then(response => {
+    //       // console.log(response)
+    //       setFunFact(response.body.text)
+    //     })
+    // }
 
     /////////////////////
 
@@ -101,6 +111,7 @@ export const QueryPage = (props) => {
           width={100}
           timeout={3000}/> :
           <Heading mt="medium">{funFact}</Heading>} */}
+          <SpaceVertical gap="xxxlarge">
           <Box display="flex" flexDirection="row">
             <Box display="flex" flexDirection="column" width="50%" maxWidth="40vw">
               <ExtensionButton
@@ -136,6 +147,24 @@ export const QueryPage = (props) => {
                 <StyledPre>{messages}</StyledPre>
             </Box>
         </Box>
+        <Box width="50%">
+          {!dataClean.value ? <Loader />:
+            <Card raised>
+              <CardMedia image="https://picsum.photos/200/300?random=1" title="random_pic" />
+              <CardContent>
+              <Text
+                  fontSize="xsmall"
+                  textTransform="uppercase"
+                  fontWeight="semiBold"
+                  variant="subdued"
+              >
+                First Name
+              </Text>
+                <Heading as="h4" fontSize="medium" fontWeight="semiBold" >{dataClean.value}</Heading>
+              </CardContent>  
+            </Card>}
+        </Box>
+        </SpaceVertical>
         </>
     )
 
