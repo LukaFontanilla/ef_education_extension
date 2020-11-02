@@ -351,7 +351,7 @@ const Extension = ( { route, routeState } ) => {
       
     </Box>
       <Card raised height="auto" bg="#ea7dc">
-      <EmbedDashboard id={962} type="next" value={user.display_name}/>
+      {/* <EmbedDashboard id={962} type="next" value={user.display_name}/> */}
       </Card>
     </SpaceVertical>
     : 
