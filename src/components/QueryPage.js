@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Heading, Box, DialogContent, DividerVertical, Flex, Card, CardContent, CardMedia, Text } from '@looker/components'
+import { Heading, Box, DialogContent, DividerVertical, Flex, Card, CardContent, CardMedia, Text, SpaceVertical } from '@looker/components'
 import styled from 'styled-components'
 import {ExtensionContext} from '@looker/extension-sdk-react'
 import { ExtensionButton } from './ExtensionButton'
@@ -80,6 +80,7 @@ export const QueryPage = (props) => {
     return (
         <>
           <Heading mt="xlarge">Query Playground</Heading>
+          <SpaceVertical gap="xxxlarge">
           <Box display="flex" flexDirection="row">
             <Box display="flex" flexDirection="column" width="50%" maxWidth="40vw">
               <ExtensionButton
@@ -127,6 +128,7 @@ export const QueryPage = (props) => {
             </Card>
             {/* } */}
         </Box>
+        </SpaceVertical>
         </>
     )
 
