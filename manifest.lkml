@@ -1,5 +1,5 @@
 application: ef_education_extension {
-  label: "EF Education"
+  label: "EF Education: <insert name>"
   url: "http://localhost:8080/bundle.js"
   entitlements: {
     use_embeds: yes

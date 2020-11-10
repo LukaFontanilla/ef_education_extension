@@ -29,7 +29,7 @@ The EF Education Extension uses [React](https://reactjs.org/) and JavaScript, th
     Should you decide to use https, you should visit the bundle URL you are running as there will likely be a certificate warning. The development server runs with a self-signed SSL certificate, so you will need to accept this to allow your browser to connect to it.
 
     The default yarn start command runs with hot module replacement working. Some changes will cause a full reload of the extension iframe. When this happens the extension framework connection will break. You should see an error. You will need to do a full page reload of the outer page.
-5. Now log in to Looker and create a new project.
+5. Now log in to Looker and create a new project. (The extension's manifest file CAN be added to an exisiting project, purely for purposes of isolation and going through the whole setup of creating the new project, attaching the model to your user's model set, is why we are going to want to follow this flow)
 
    This is found under __Develop__ => __Manage LookML Projects__ => __New LookML Project__.
 
@@ -37,7 +37,7 @@ The EF Education Extension uses [React](https://reactjs.org/) and JavaScript, th
 6. In your copy of the extension tablet you have `manifest.lkml` file.
 
     You can either drag & upload this file into your Looker project, or create your own manifest file (e.g. to change the extension name).
-7. Update the `ef_education_extension.model.lkml` file in your project:
+7. Update the `ef_education_extension_<your_name>.model.lkml` file in your project:
     - Add a [connection parameter](https://docs.looker.com/r/lookml/types/model/connection) to this model. It can be any connection, it doesn't matter which.
     - [Configure the model you created](https://docs.looker.com/r/develop/configure-model) so that it has access to the connection.
 8. Connect your new project to Git. You can do this multiple ways:
