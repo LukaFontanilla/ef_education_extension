@@ -53,7 +53,7 @@ The EF Education Extension uses [React](https://reactjs.org/) and JavaScript, th
 The process above requires your local development server to be running to load the extension code. To allow other people to use the extension, we can build the JavaScript file and include it in the project directly.
 
 1. In your extension project directory on your development machine you can build the extension with `yarn build`.
-2. Drag and drop the generated `bundle.js` file into the Looker project interface
+2. Drag and drop the generated `bundle.js` file from the `dist` directory into the Looker project interface
 3. Modify your `manifest.lkml` to use `file` instead of `url`:
     ```
     application: ef_education_extension {
