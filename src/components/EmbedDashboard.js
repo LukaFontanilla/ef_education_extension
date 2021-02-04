@@ -70,7 +70,7 @@ export const EmbedDashboard = ({id, value}) => {
         // }
         db.appendTo(el)
           .withClassName('looker-dashboard')
-          .withFilters({'user.name': value})
+          // .withFilters({'user.name': value})
           .on('page:properties:changed', (e) => resizeContent(e.height))
           .on('drillmenu:click', canceller)
           .on('drillmodal:explore', canceller)

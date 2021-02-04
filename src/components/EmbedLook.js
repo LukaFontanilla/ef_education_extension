@@ -43,7 +43,7 @@ export const EmbedLook = ({ id, value }) => {
         LookerEmbedSDK.createLookWithId(id)
           .appendTo(el)
           .withClassName('looker-look')
-          .withFilters({'user.name': value})
+          // .withFilters({'user.name': value})
           .on('drillmodal:explore', setComplete(true))
           .on('explore:ready', setComplete(false))
           .build()

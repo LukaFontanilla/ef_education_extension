@@ -373,8 +373,11 @@ const Extension = ( { route, routeState } ) => {
       <Card raised height="auto" bg="#ea7dc">
 
       
-      <EmbedLook id={1985} value={user.display_name}/>
-      {/* <EmbedDashboard id={962} type="next" value={user.display_name}/> */}
+      {/* <EmbedLook id={1244}/> */}
+       {/* id={1985}  */}
+      {/* value={user.display_name} */}
+      <EmbedDashboard id={1204} type="next" />
+      // value={user.display_name}
       </Card>
       {/* <Button onClick={getUserAttributes}>CLick Me!</Button> */}
       <AttributeTable data={attributes}/>
